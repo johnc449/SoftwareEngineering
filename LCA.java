@@ -1,76 +1,63 @@
-import java.util.ArrayList;
-import java.util.List;
- 
-// A Binary Tree node
-class Node {
-    int data;
-    Node left, right;
- 
-    Node(int value) {
-        data = value;
-        left = right = null;
+public class LCA {
+	private int V;
+	private int E;
+	private int[][] adj;
+	private int[] odegree;
+	private int[] idegree;
+
+	// initialises empty graph with v vertices
+	public LCA(int V) {
+		this.V = V;
+		this.E = 0;
+		idegree = new int[V];
+		odegree = new int[V];
+		adj = new int[V][V];
+		for (int i = 0; i < V; i++) {
+			for (int j = 0; j < V; j++) {
+				adj[i][j] = 0;
+			}
+		}
+	}
+
+	public void addEdge(int v, int w){
+	    adj[v][w]=1;
+	    idegree[w]++;
+	    odegree[v]++;
+	    E++;
     }
-}
- 
-public class LCA
-{
- 
-    Node root;
-    private List<Integer> path1 = new ArrayList<>();
-    private List<Integer> path2 = new ArrayList<>();
- 
-    // Finds the path from root node to given root of the tree.
-    int findLCA(int n1, int n2) {
-        path1.clear();
-        path2.clear();
-        return findLCARecursive(root, n1, n2);
-    }
- 
-    private int findLCARecursive(Node root, int n1, int n2) {
- 
-        if (!findPath(root, n1, path1) || !findPath(root, n2, path2)) {
-            System.out.println((path1.size() > 0) ? "n1 is present" : "n1 is missing");
-            System.out.println((path2.size() > 0) ? "n2 is present" : "n2 is missing");
-            return -1;
-        }
- 
-        int i;
-        for (i = 0; i < path1.size() && i < path2.size(); i++) {
-             
-            if (!path1.get(i).equals(path2.get(i)))
-                break;
-        }
- 
-        return path1.get(i-1);
-    }
-     
-    private boolean findPath(Node root, int n, List<Integer> path)
-    {
-        // base case
-        if (root == null) {
-            return false;
-        }
-         
-        path.add(root.data);
- 
-        if (root.data == n) {
-            return true;
-        }
- 
-        if (root.left != null && findPath(root.left, n, path)) {
-            return true;
-        }
- 
-        if (root.right != null && findPath(root.right, n, path)) {
-            return true;
-        }
-        path.remove(path.size()-1);
- 
-        return false;
-    }
- 
-    // Main code
-    public static void main(String[] args)
-    {
-    }
+	public int LCAFind(int v, int w) {
+		int vCount = 0;
+		int wCount = 0;
+		boolean[] vMarked = new boolean[V];
+		boolean[] wMark = new boolean[V];
+		int[] verticesArray = new int[E];
+		int[] wArray = new int[E];
+		
+		verticesArray[vCount] = v;
+		wArray[wCount] = w;
+		for (int j = 0; j < V; j++) {// marks vertices as not visited
+			vMarked[j] = false;
+			wMark[j] = false;
+		}
+		for (int i = 0; i < V; i++) {
+			vMarked[v] = true;
+			wMark[w] = true;
+			for (int j = 0; j < V; j++) {
+				if (adj[i][j] == 1 && vMarked[i]) {
+					vCount++;
+					verticesArray[vCount] = j;
+					vMarked[j] = true;
+				}
+				if (adj[i][j] == 1 && wMark[i]) {
+					wCount++;
+					wArray[wCount] = j;
+					wMark[j] = true;
+				}
+				if (wArray[wCount] == verticesArray[vCount]) {
+					return wArray[wCount];
+				}
+			}
+		}
+		return -1;
+	}
 }
