@@ -32,6 +32,9 @@ public class LCA {
 		boolean[] wMark = new boolean[V];
 		int[] verticesArray = new int[E];
 		int[] wArray = new int[E];
+		if(E==0) {
+			return -1;
+		}
 		
 		verticesArray[vCount] = v;
 		wArray[wCount] = w;
@@ -39,6 +42,7 @@ public class LCA {
 			vMarked[j] = false;
 			wMark[j] = false;
 		}
+		for(int counterFix = 0; counterFix < V; counterFix++) {
 		for (int i = 0; i < V; i++) {
 			vMarked[v] = true;
 			wMark[w] = true;
@@ -56,8 +60,7 @@ public class LCA {
 				if (wArray[wCount] == verticesArray[vCount]) {
 					return wArray[wCount];
 				}
-			}
-		}
-		return -1;
+			}}
+		}return -1;
 	}
 }
