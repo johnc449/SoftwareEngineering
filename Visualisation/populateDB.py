@@ -1,3 +1,8 @@
+from github import Github   # github api access
+import json                 # for converting a dictionary to a string
+import pymongo              # for mongodb access
+import os
+
 #Access Token- Keep this out of the way
 g = Github("--------------------------")
 
