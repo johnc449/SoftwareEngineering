@@ -4,7 +4,7 @@ import sqlite3
 import os
 from collections import defaultdict
 
-g = Github("__________________________________________")
+g = Github("-----------")
 repoAddress = input("What repo would you like to get? ")
 repo =g.get_repo(repoAddress)
 issues = repo.get_issues()
@@ -22,9 +22,12 @@ for issue in issues:
 
 print ("dictionary is " + json.dumps(labelCountDct))
 
-
+filePath = "Visualisation/data.db"
+#Wipes old db if there is one currently at address
+if os.path.exists(filePath):
+    os.remove(filePath)
 # Establish connection
-conn = sqlite3.connect("Visualisation/data.db",isolation_level=None)
+conn = sqlite3.connect(filePath,isolation_level=None)
 conn.execute('''CREATE TABLE MAIN
          (LABEL TEXT PRIMARY KEY NOT NULL,
          COUNT          INTEGER NOT NULL,
