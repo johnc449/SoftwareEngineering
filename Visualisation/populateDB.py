@@ -2,70 +2,37 @@ from github import Github   # github api access
 import json                 # for converting a dictionary to a string
 import sqlite3
 import os
-
-# Load the faker and its providers
-from faker import Faker     # for anonymising names
 from collections import defaultdict
-faker  = Faker()
-names  = defaultdict(faker.name)
 
-g = Github("_________________________")
+g = Github("__________________________________________")
+repoAddress = input("What repo would you like to get? ")
+repo =g.get_repo(repoAddress)
+issues = repo.get_issues()
+labelCountDct = defaultdict(lambda: 0, {})
+labelMixDct = defaultdict(lambda: 0, {})
+for issue in issues:
+       print(issue.get_labels().totalCount)
+       if(issue.get_labels().totalCount == 0):
+           labelCountDct["unlabeled"] += 1
+       for label in issue.get_labels():   
+              if issue.get_labels().totalCount>1:
+                    labelMixDct[label.name] += 1
+              labelCountDct[label.name] += 1
+         
 
-usr = g.get_user()
+print ("dictionary is " + json.dumps(labelCountDct))
 
-dct = {'user':         names[usr.login].replace(" ", ""), # anonymising
-       'fullname':     names[usr.name],  # anonymising
-       'location':     usr.location,
-       'company':      usr.company,
-       'public_repos': usr.public_repos
-       }
-
-print ("dictionary is " + json.dumps(dct))
-
-#not cleaning dictionary currently
-#for k, v in dict(dct).items():
-#    if v is None:
-#        del dct[k]
-
-print ("cleaned dictionary is " + json.dumps(dct))
 
 # Establish connection
-conn = sqlite3.connect("Visualisation/data.db")
+conn = sqlite3.connect("Visualisation/data.db",isolation_level=None)
 conn.execute('''CREATE TABLE MAIN
-         (USER TEXT PRIMARY KEY NOT NULL,
-         FULLNAME          TEXT NOT NULL,
-         LOCATION          TEXT,
-         COMPANY           TEXT,
-         PUBLIC_REPOS      TEXT );''')
-print("Table created successfully");
-#USER,FULLNAME,LOCATION,COMPANY,PUBLIC_REPOS
-conn.execute("INSERT INTO COMPANY (USER,FULLNAME,LOCATION,COMPANY,PUBLIC_REPOS) \ #fix this, wrong format
-      VALUES ("+str(dct["user"])+","+str(dct["fullname"])+","+
-      str(dct["location"])+","+ str(dct["company"])+","+ str(dct["public_repos"])+")")
-
-'''
-# and for each of them we'll get and add a count of the number of repos they have
-fc = usr.followers
-print ("followers: " + str(fc))
-
-# now lets get those followers
-fl = usr.get_followers()
-
-for f in fl:
-    dct = {'user':         names[f.login].replace(" ",""), # anonymising
-           'fullname':     names[f.name], # anonymising
-           'location':     f.location,
-           'company':      f.company,
-           'public_repos': f.public_repos
-           }
-    for k, v in dict(dct).items():
-        if v is None:
-            del dct[k]
-        
-    print("follower: " + json.dumps(dct))
-    conn.execute("INSERT INTO main VALUES (?,?,?,?,?)",
-     [dct["user"], dct["fullname"], dct["location"],dct["company"],dct["public_repos"]]) 
-
-'''
+         (LABEL TEXT PRIMARY KEY NOT NULL,
+         COUNT          INTEGER NOT NULL,
+         REPEATCOUNT          INTEGER NOT NULL );''')
+print("Table created successfully")
+for key in labelCountDct:
+    conn.execute('INSERT INTO MAIN (LABEL,COUNT,REPEATCOUNT)\
+            VALUES (:label, :count, :repeatcount)', {"label":key,"count":labelCountDct[key],"repeatcount":labelMixDct[key]})
+conn.close
 
 
