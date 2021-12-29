@@ -3,7 +3,7 @@ import json                 # for converting a dictionary to a string
 import sqlite3
 import os
 from collections import defaultdict
-g = Github("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")
+g = Github("_____________________-___")
 repoAddress = input("What repo would you like to get? ")
 repo =g.get_repo(repoAddress)
 issues = repo.get_issues()
