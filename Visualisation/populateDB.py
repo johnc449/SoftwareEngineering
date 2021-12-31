@@ -1,9 +1,10 @@
 from github import Github   # github api access
 import json                 # for converting a dictionary to a string
 import sqlite3
+import re
 import os
 from collections import defaultdict
-g = Github("_____________________-___")
+g = Github("-------------------------------------------")
 repoAddress = input("What repo would you like to get? ")
 repo =g.get_repo(repoAddress)
 issues = repo.get_issues()
@@ -40,10 +41,10 @@ for key in labelCountDct:
 for key in labelMixMatrix:
     conn.execute('''CREATE TABLE {keyString}
          (LABEL TEXT PRIMARY KEY NOT NULL,
-         COUNT          INTEGER NOT NULL);'''.format(keyString=key.replace(" ","_")))
+         COUNT          INTEGER NOT NULL);'''.format(keyString=re.sub("[^0-9a-zA-Z]+", "_",key)))
     for subkey in labelMixMatrix[key]:
         conn.execute('INSERT INTO {keyString} (LABEL,COUNT)\
-            VALUES (:label, :count)'.format(keyString=key.replace(" ","_")), 
+            VALUES (:label, :count)'.format(keyString=re.sub("[^0-9a-zA-Z]+", "_",key)), 
             {"label":subkey,"count":labelMixMatrix[key][subkey]})
 print("Table created successfully")
 conn.close
